@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>testtesttestest</title>
+    <title>Бизнес-симулятор</title>
     <style>
         :root {
             --primary: #FF0032;
@@ -52,6 +52,7 @@
             flex-wrap: wrap;
             gap: 1rem;
             margin-top: 1rem;
+            transition: all 0.3s ease;
         }
         
         .setup-area, .team-area, .business-area, .news-area {
@@ -64,6 +65,10 @@
         
         .setup-area {
             width: 100%;
+        }
+        
+        .setup-area.hidden {
+            display: none;
         }
         
         .team-area {
@@ -108,10 +113,9 @@
         
         .business-image {
             width: 100%;
-            height: 120px;
+            height: 150px;
             object-fit: cover;
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
+            border-radius: 8px;
         }
         
         .stock-price {
@@ -261,11 +265,15 @@
         }
         
         .news-item {
-            margin-bottom: 0.5rem;
-            line-height: 1.5;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
         }
         
         .news-effect {
+            margin-top: 10px;
+            color: #2a9d8f;
             font-weight: bold;
         }
         
@@ -280,6 +288,10 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
         }
         
         .modal-content {
@@ -352,11 +364,15 @@
         .show {
             display: flex;
         }
-        #business-list{
+        
+        #business-list {
             display: flex;
             flex-wrap: wrap;
         }
         
+        .game-started .game-area {
+            padding-top: 20px;
+        }
         
         @media (max-width: 768px) {
             .business-card {
@@ -377,7 +393,7 @@
 </head>
 <body>
     <header>
-        <h1>testtesttestest</h1>
+        <h1>Бизнес-симулятор</h1>
     </header>
     
     <div class="container">
@@ -444,96 +460,51 @@
         </div>
     </div>
     
-<script>
+    <script>
     const businesses = [
         {
             id: 1,
-            name: "Онлайн-магазин одежды",
-            description: "Продаёт стильную одежду через интернет",
-            image: "/pic.webp",
-            price: 25,
-            priceHistory: [25],
+            name: "Tesla",
+            description: "Производство электромобилей и инновационных технологий",
+            image: "https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg",
+            price: 50,
+            priceHistory: [50],
             changePercent: 0
         },
         {
             id: 2,
-            name: "Гейм-студия",
-            description: "Делает мобильные игры и продаёт внутриигровые покупки",
-            image: "/pic.webp",
-            price: 30,
-            priceHistory: [30],
+            name: "Apple",
+            description: "Технологический гигант, производящий электронику",
+            image: "https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg",
+            price: 45,
+            priceHistory: [45],
             changePercent: 0
         },
         {
             id: 3,
-            name: "Видеоблогер",
-            description: "Популярен в ВК Видео и получает деньги за рекламу",
-            image: "/pic.webp",
-            price: 20,
-            priceHistory: [20],
-            changePercent: 0
-        },
-        {
-            id: 4,
-            name: "Фастфуд-сеть",
-            description: "Продаёт бургеры, картошку и напитки",
-            image: "/pic.webp",
-            price: 25,
-            priceHistory: [25],
-            changePercent: 0
-        },
-        {
-            id: 5,
-            name: "Детский парк развлечений",
-            description: "Аттракционы, батуты и мороженое",
-            image: "/pic.webp",
+            name: "Netflix",
+            description: "Стриминговый сервис фильмов и сериалов",
+            image: "https://images.pexels.com/photos/987586/pexels-photo-987586.jpeg",
             price: 35,
             priceHistory: [35],
             changePercent: 0
         },
         {
-            id: 6,
-            name: "Игровая платформа",
-            description: "Онлайн-сервис, где можно покупать и скачивать игры",
-            image: "/pic.webp",
+            id: 4,
+            name: "Amazon",
+            description: "Крупнейший онлайн-ритейлер и облачный провайдер",
+            image: "https://images.pexels.com/photos/2882634/pexels-photo-2882634.jpeg",
             price: 40,
             priceHistory: [40],
             changePercent: 0
         },
         {
-            id: 7,
-            name: "Приложение по планированию бюджета",
-            description: "Помогает считать деньги и копить на мечту",
-            image: "/pic.webp",
-            price: 15,
-            priceHistory: [15],
-            changePercent: 0
-        },
-        {
-            id: 8,
-            name: "Мобильный оператор",
-            description: "Продаёт интернет и звонки",
-            image: "/pic.webp",
-            price: 30,
-            priceHistory: [30],
-            changePercent: 0
-        },
-        {
-            id: 9,
-            name: "Конструктор сайтов",
-            description: "Помогает легко создавать сайты",
-            image: "/pic.webp",
-            price: 20,
-            priceHistory: [20],
-            changePercent: 0
-        },
-        {
-            id: 10,
-            name: "Электронная книга",
-            description: "Платформа с книгами и комиксами онлайн",
-            image: "/pic.webp",
-            price: 15,
-            priceHistory: [15],
+            id: 5,
+            name: "Microsoft",
+            description: "Разработка программного обеспечения и облачных решений",
+            image: "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg",
+            price: 42,
+            priceHistory: [42],
             changePercent: 0
         }
     ];
@@ -541,184 +512,56 @@
     const newsRounds = [
         [
             {
-                text: "В школе прошёл модный день — почти все в одежде с онлайн-заказа!",
-                effects: [{ businessId: 1, change: 20 }],
-                explanation: "Онлайн-магазин одежды +20% — дети делятся где покупали"
+                text: "Tesla представила революционный электромобиль с запасом хода 1000 км!",
+                effects: [{ businessId: 1, change: 80 }],
+                explanation: "Tesla +80% — Инновационный прорыв привлек внимание инвесторов"
             },
             {
-                text: "Новая мобильная игра захватила топ — её качают даже учителя!",
-                effects: [{ businessId: 2, change: 15 }],
-                explanation: "Гейм-студия +15% — популярность = рост доходов"
+                text: "Apple столкнулась с проблемами в производстве новых iPhone",
+                effects: [{ businessId: 2, change: -40 }],
+                explanation: "Apple -40% — Задержки в производстве вызвали панику"
             },
             {
-                text: "Видеоблогер устроил стрим с раздачей призов!",
-                effects: [{ businessId: 3, change: 10 }],
-                explanation: "Видеоблогер +10% — больше подписчиков и донатов"
+                text: "Netflix выпустил новый хитовый сериал",
+                effects: [{ businessId: 3, change: 60 }],
+                explanation: "Netflix +60% — Рекордные просмотры нового контента"
+            },
+            {
+                text: "Amazon открыл инновационные магазины без продавцов",
+                effects: [{ businessId: 4, change: 50 }],
+                explanation: "Amazon +50% — Технологический прорыв в ритейле"
+            },
+            {
+                text: "Microsoft обнаружила серьезную уязвимость в Windows",
+                effects: [{ businessId: 5, change: -45 }],
+                explanation: "Microsoft -45% — Репутационные риски"
             }
         ],
         [
             {
-                text: "Сбой у мобильного оператора — нет интернета на перемене!",
-                effects: [{ businessId: 8, change: -25 }],
-                explanation: "Мобильный оператор -25% — недовольство и отписки"
+                text: "Tesla отзывает 100,000 автомобилей из-за проблем с батареей",
+                effects: [{ businessId: 1, change: -60 }],
+                explanation: "Tesla -60% — Массовый отзыв продукции"
             },
             {
-                text: "Онлайн-магазин одежды задержал заказы на 3 дня",
-                effects: [{ businessId: 1, change: -10 }],
-                explanation: "Онлайн-магазин -10% — клиенты жалуются"
+                text: "Apple представила революционные AR-очки",
+                effects: [{ businessId: 2, change: 90 }],
+                explanation: "Apple +90% — Новый прорывной продукт"
             },
             {
-                text: "Конструктор сайтов запустил новогодний дизайн бесплатно",
-                effects: [{ businessId: 9, change: 20 }],
-                explanation: "Конструктор сайтов +20% — скачивают даже для школьных проектов"
-            }
-        ],
-        [
-            {
-                text: "В парке открыли аттракцион: \"Полет на комете\"!",
-                effects: [{ businessId: 5, change: 25 }],
-                explanation: "Детский парк +25% — длинные очереди и довольные дети"
+                text: "Netflix теряет подписчиков из-за роста цен",
+                effects: [{ businessId: 3, change: -50 }],
+                explanation: "Netflix -50% — Отток пользователей"
             },
             {
-                text: "Гейм-студия анонсировала новую часть хита",
-                effects: [{ businessId: 2, change: 10 }],
-                explanation: "Гейм-студия +10% — фанаты в ожидании"
+                text: "Amazon запускает доставку дронами",
+                effects: [{ businessId: 4, change: 70 }],
+                explanation: "Amazon +70% — Инновации в логистике"
             },
             {
-                text: "Платформа с книгами стала тормозить — все жалуются",
-                effects: [{ businessId: 10, change: -15 }],
-                explanation: "Электронная книга -15% — падают рейтинги"
-            }
-        ],
-        [
-            {
-                text: "Фастфуд-сеть ввела акцию — бургер за 50 монет!",
-                effects: [{ businessId: 4, change: 20 }],
-                explanation: "Фастфуд +20% — толпы в заведениях"
-            },
-            {
-                text: "Приложение для бюджета получило детскую версию",
-                effects: [{ businessId: 7, change: 25 }],
-                explanation: "Бюджетное приложение +25% — теперь его качают и младшие школьники"
-            },
-            {
-                text: "Видеоблогер пошутил про парк — людям не понравилось",
-                effects: [
-                    { businessId: 3, change: -10 },
-                    { businessId: 5, change: -5 }
-                ],
-                explanation: "Видеоблогер -10%, Парк -5% — упал имидж"
-            }
-        ],
-        [
-            {
-                text: "Летняя жара — все бегут в парки и фастфуд за мороженым",
-                effects: [
-                    { businessId: 5, change: 15 },
-                    { businessId: 4, change: 15 }
-                ],
-                explanation: "Парк +15%, Фастфуд +15%"
-            },
-            {
-                text: "Из-за жары интернет лагает ещё сильнее",
-                effects: [{ businessId: 8, change: -15 }],
-                explanation: "Мобильный оператор -15%"
-            },
-            {
-                text: "Сайт конструктора временно не работает",
-                effects: [{ businessId: 9, change: -20 }],
-                explanation: "Конструктор сайтов -20%"
-            }
-        ],
-        [
-            {
-                text: "Глобальный глюк на игровых платформах",
-                effects: [
-                    { businessId: 6, change: -30 },
-                    { businessId: 2, change: -10 }
-                ],
-                explanation: "Игровая платформа -30%, Гейм-студия -10%"
-            },
-            {
-                text: "Приложение по бюджету дарит стикеры за установку",
-                effects: [{ businessId: 7, change: 10 }],
-                explanation: "Бюджетное приложение +10%"
-            },
-            {
-                text: "Фастфуд случайно отправил 500 бесплатных заказов",
-                effects: [{ businessId: 4, change: -10 }],
-                explanation: "Фастфуд -10% — потери из-за ошибки"
-            }
-        ],
-        [
-            {
-                text: "Видеоблогер выиграл премию \"Лучший контент года\"",
-                effects: [{ businessId: 3, change: 25 }],
-                explanation: "Видеоблогер +25%"
-            },
-            {
-                text: "Онлайн-магазин ввёл удобную оплату в один клик",
-                effects: [{ businessId: 1, change: 15 }],
-                explanation: "Онлайн-магазин одежды +15%"
-            },
-            {
-                text: "Игровая платформа запустила распродажу \"3 игры по цене 1\"",
-                effects: [{ businessId: 6, change: 25 }],
-                explanation: "Игровая платформа +25%"
-            }
-        ],
-        [
-            {
-                text: "Конструктор сайтов стал хитом среди учителей — делают сайты классов!",
-                effects: [{ businessId: 9, change: 20 }],
-                explanation: "Конструктор сайтов +20%"
-            },
-            {
-                text: "Приложение по бюджету стало требовать оплату",
-                effects: [{ businessId: 7, change: -20 }],
-                explanation: "Бюджетное приложение -20%"
-            },
-            {
-                text: "Парк закрылся на ремонт",
-                effects: [{ businessId: 5, change: -25 }],
-                explanation: "Парк -25%"
-            }
-        ],
-        [
-            {
-                text: "На платформе с книгами — бесплатная неделя!",
-                effects: [{ businessId: 10, change: 20 }],
-                explanation: "Электронная книга +20%"
-            },
-            {
-                text: "Фастфуд завёл TikTok — и стал трендом!",
-                effects: [{ businessId: 4, change: 20 }],
-                explanation: "Фастфуд +20%"
-            },
-            {
-                text: "Гейм-студия уволила половину сотрудников",
-                effects: [{ businessId: 2, change: -20 }],
-                explanation: "Гейм-студия -20%"
-            }
-        ],
-        [
-            {
-                text: "Мобильный оператор добавил новый тариф для геймеров",
-                effects: [
-                    { businessId: 8, change: 20 },
-                    { businessId: 6, change: 10 }
-                ],
-                explanation: "Мобильный оператор +20%, Игровая платформа +10%"
-            },
-            {
-                text: "Известный блогер ушёл на отдых",
-                effects: [{ businessId: 3, change: -15 }],
-                explanation: "Видеоблогер -15%"
-            },
-            {
-                text: "Приложение для бюджета стало работать в офлайн-режиме!",
-                effects: [{ businessId: 7, change: 20 }],
-                explanation: "Бюджетное приложение +20%"
+                text: "Microsoft получила крупный государственный контракт",
+                effects: [{ businessId: 5, change: 85 }],
+                explanation: "Microsoft +85% — Стратегическое партнерство"
             }
         ]
     ];
@@ -739,23 +582,22 @@
     const modalContent = document.getElementById('modal-content');
 
     function renderDashboard() {
-    const dashboardContainer = document.getElementById('dashboard-block');
-    if (!dashboardContainer) return;
-    dashboardContainer.innerHTML = '<h3>Дашборд команд (монеты + стоимость активов)</h3>';
+        const dashboardContainer = document.getElementById('dashboard-block');
+        if (!dashboardContainer) return;
+        dashboardContainer.innerHTML = '<h3>Дашборд команд (монеты + стоимость активов)</h3>';
 
-    teams.forEach(team => {
-        // Пересчитываем стоимость активов по текущим ценам
-        const assetsValue = team.assets.reduce((sum, a) => {
-            const b = businesses.find(bb => bb.id === a.businessId);
-            return sum + (b.price * a.quantity); // Используем актуальную цену
-        }, 0);
-        
-        const total = team.coins + assetsValue;
-        const p = document.createElement('p');
-        p.textContent = `${team.name}: ${total} монет (${team.coins} монет + ${assetsValue} в активах)`;
-        dashboardContainer.appendChild(p);
-    });
-}
+        teams.forEach(team => {
+            const assetsValue = team.assets.reduce((sum, a) => {
+                const b = businesses.find(bb => bb.id === a.businessId);
+                return sum + (b.price * a.quantity);
+            }, 0);
+            
+            const total = team.coins + assetsValue;
+            const p = document.createElement('p');
+            p.textContent = `${team.name}: ${total} монет (${team.coins} монет + ${assetsValue} в активах)`;
+            dashboardContainer.appendChild(p);
+        });
+    }
 
     function selectTeam(teamId) {
         selectedTeamId = teamId;
@@ -912,8 +754,15 @@
     function startNextRound() {
         if (currentRound >= 10) return;
 
+        if (currentRound === 0) {
+            document.getElementById('setup-area').classList.add('hidden');
+            document.body.classList.add('game-started');
+        }
+
         const currentNews = newsRounds[currentRound];
-        updatePrices(currentNews[0]);
+        currentNews.forEach(news => {
+            updatePrices([news]);
+        });
         showNewsModal(currentNews);
 
         currentRound++;
@@ -1023,7 +872,6 @@
     }
 
     init();
-</script>
-
+    </script>
 </body>
 </html>
