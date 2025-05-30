@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бизнес-симулятор</title>
+    <style>
+        :root {
+            --primary: #FF0032;
+            --secondary: #3a0ca3;
+            --success: #2a9d8f;
+            --danger: #e63946;
+            --warning: #ffb703;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .setup-area, .team-area, .business-area, .news-area {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        
+        .setup-area {
+            width: 100%;
+        }
+        
+        .setup-area.hidden {
+            display: none;
+        }
+        
+        .team-area {
+            flex: 1;
+            min-width: 300px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .business-area {
+            flex: 2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            min-width: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .news-area {
+            width: 100%;
+            text-align: center;
+            display: none;
+        }
+        
+        .business-card {
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            padding: 0.5rem;
+            width: calc(33.333% - 1rem);
+            min-width: 170px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            background: white;
+        }
+        
+        .business-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .business-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .stock-price {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .price-change {
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        
+        .price-up {
+            color: var(--success);
+        }
+        
+        .price-down {
+            color: var(--danger);
+        }
+        
+        .team-container {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .selected-team {
+            border: 2px solid var(--primary);
+            margin: -2px;
+            box-shadow: 0 0 10px rgba(67, 97, 238, 0.2);
+            border-radius: 10px;
+        }
+        
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .team-assets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .team-asset {
+            background: var(--light);
+            border-radius: 5px;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+        
+        .team-asset img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+        
+        .asset-details {
+            font-size: 0.8rem;
+        }
+        
+        .sell-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .team-asset:hover .sell-btn {
+            opacity: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .news-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+            border: 2px solid var(--warning);
+            border-radius: 10px;
+            background-color: #fff9db;
+            text-align: left;
+        }
+        
+        .news-title {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .news-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .news-effect {
+            margin-top: 10px;
+            color: #2a9d8f;
+            font-weight: bold;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .round-indicator {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .scoreboard {
+            width: 100%;
+            margin-top: 2rem;
+            border-collapse: collapse;
+        }
+        
+        .scoreboard th, .scoreboard td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .scoreboard th {
+            background-color: var(--light);
+        }
+        
+        .winner {
+            background-color: #ffd700;
+            font-weight: bold;
+        }
+        
+        .runner-up {
+            background-color: #c0c0c0;
+        }
+        
+        .third-place {
+            background-color: #cd7f32;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .show {
+            display: flex;
+        }
+        
+        #business-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .game-started .game-area {
+            padding-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .business-card {
+                width: calc(50% - 1rem);
+            }
+            
+            .team-area, .business-area {
+                flex: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .business-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Бизнес-симулятор</h1>
+    </header>
+    
+    <div class="container">
+        <div class="setup-area" id="setup-area">
+            <h2>Команды</h2>
+            <p>У каждой команды есть 100 монет для покупки акций бизнесов. Можно купить максимум 5 акций каждого бизнеса.</p>
+            
+            <div class="form-group">
+                <input type="text" class="form-control" id="team-name" placeholder="Название команды">
+                <small>Введите название вашей команды</small>
+            </div>
+            
+            <button class="btn btn-primary" id="add-team-btn">Добавить команду</button>
+        </div>
+        
+        <div class="game-area">
+            <div class="team-area" id="team-area">
+                <h2>Команды и их активы</h2>
+                <div id="dashboard-block" class="setup-area"></div>
+                <div id="team-list"></div>
+            </div>
+            
+            <div class="business-area" id="business-area">
+                <h2>Доступные бизнесы</h2>
+                <div id="business-list"></div>
+            </div>
+        </div>
+        
+        <div class="news-area" id="news-area">
+            <h2 class="news-title">Новости Раунда <span id="current-round">1</span></h2>
+            <div class="news-container" id="news-container"></div>
+            
+            <div class="game-controls">
+                <button class="btn btn-success" id="next-round-btn">Следующий раунд</button>
+                <span class="round-indicator">Раунд <span id="round-display">1</span>/10</span>
+            </div>
+        </div>
+        
+        <div id="results-area" class="hidden">
+            <h2>Результаты игры</h2>
+            <table class="scoreboard" id="scoreboard">
+                <thead>
+                    <tr>
+                        <th>Место</th>
+                        <th>Команда</th>
+                        <th>Монеты</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+            
+            <div class="game-controls">
+                <button class="btn btn-primary" id="restart-btn">Начать заново</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="news-modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Новости рынка</h2>
+            <div id="modal-content"></div>
+            <button class="btn btn-primary" id="close-news-btn">Закрыть</button>
+        </div>
+    </div>
+    
+    <script>
+    const businesses = [
+        {
+            id: 1,
+            name: "Tesla",
+            description: "Производство электромобилей и инновационных технологий",
+            image: "https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg",
+            price: 50,
+            priceHistory: [50],
+            changePercent: 0
+        },
+        {
+            id: 2,
+            name: "Apple",
+            description: "Технологический гигант, производящий электронику",
+            image: "https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg",
+            price: 45,
+            priceHistory: [45],
+            changePercent: 0
+        },
+        {
+            id: 3,
+            name: "Netflix",
+            description: "Стриминговый сервис фильмов и сериалов",
+            image: "https://images.pexels.com/photos/987586/pexels-photo-987586.jpeg",
+            price: 35,
+            priceHistory: [35],
+            changePercent: 0
+        },
+        {
+            id: 4,
+            name: "Amazon",
+            description: "Крупнейший онлайн-ритейлер и облачный провайдер",
+            image: "https://images.pexels.com/photos/2882634/pexels-photo-2882634.jpeg",
+            price: 40,
+            priceHistory: [40],
+            changePercent: 0
+        },
+        {
+            id: 5,
+            name: "Microsoft",
+            description: "Разработка программного обеспечения и облачных решений",
+            image: "https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg",
+            price: 42,
+            priceHistory: [42],
+            changePercent: 0
+        }
+    ];
+
+    const newsRounds = [
+        [
+            {
+                text: "Tesla представила революционный электромобиль с запасом хода 1000 км!",
+                effects: [{ businessId: 1, change: 80 }],
+                explanation: "Tesla +80% — Инновационный прорыв привлек внимание инвесторов"
+            },
+            {
+                text: "Apple столкнулась с проблемами в производстве новых iPhone",
+                effects: [{ businessId: 2, change: -40 }],
+                explanation: "Apple -40% — Задержки в производстве вызвали панику"
+            },
+            {
+                text: "Netflix выпустил новый хитовый сериал",
+                effects: [{ businessId: 3, change: 60 }],
+                explanation: "Netflix +60% — Рекордные просмотры нового контента"
+            },
+            {
+                text: "Amazon открыл инновационные магазины без продавцов",
+                effects: [{ businessId: 4, change: 50 }],
+                explanation: "Amazon +50% — Технологический прорыв в ритейле"
+            },
+            {
+                text: "Microsoft обнаружила серьезную уязвимость в Windows",
+                effects: [{ businessId: 5, change: -45 }],
+                explanation: "Microsoft -45% — Репутационные риски"
+            }
+        ],
+        [
+            {
+                text: "Tesla отзывает 100,000 автомобилей из-за проблем с батареей",
+                effects: [{ businessId: 1, change: -60 }],
+                explanation: "Tesla -60% — Массовый отзыв продукции"
+            },
+            {
+                text: "Apple представила революционные AR-очки",
+                effects: [{ businessId: 2, change: 90 }],
+                explanation: "Apple +90% — Новый прорывной продукт"
+            },
+            {
+                text: "Netflix теряет подписчиков из-за роста цен",
+                effects: [{ businessId: 3, change: -50 }],
+                explanation: "Netflix -50% — Отток пользователей"
+            },
+            {
+                text: "Amazon запускает доставку дронами",
+                effects: [{ businessId: 4, change: 70 }],
+                explanation: "Amazon +70% — Инновации в логистике"
+            },
+            {
+                text: "Microsoft получила крупный государственный контракт",
+                effects: [{ businessId: 5, change: 85 }],
+                explanation: "Microsoft +85% — Стратегическое партнерство"
+            }
+        ]
+    ];
+
+    let teams = [];
+    let currentRound = 0;
+    let gameStarted = false;
+    let selectedTeamId = null;
+
+    const teamNameInput = document.getElementById('team-name');
+    const addTeamBtn = document.getElementById('add-team-btn');
+    const teamList = document.getElementById('team-list');
+    const businessList = document.getElementById('business-list');
+    const nextRoundBtn = document.getElementById('next-round-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const newsModal = document.getElementById('news-modal');
+    const closeNewsBtn = document.getElementById('close-news-btn');
+    const modalContent = document.getElementById('modal-content');
+
+    function renderDashboard() {
+        const dashboardContainer = document.getElementById('dashboard-block');
+        if (!dashboardContainer) return;
+        dashboardContainer.innerHTML = '<h3>Дашборд команд (монеты + стоимость активов)</h3>';
+
+        teams.forEach(team => {
+            const assetsValue = team.assets.reduce((sum, a) => {
+                const b = businesses.find(bb => bb.id === a.businessId);
+                return sum + (b.price * a.quantity);
+            }, 0);
+            
+            const total = team.coins + assetsValue;
+            const p = document.createElement('p');
+            p.textContent = `${team.name}: ${total} монет (${team.coins} монет + ${assetsValue} в активах)`;
+            dashboardContainer.appendChild(p);
+        });
+    }
+
+    function selectTeam(teamId) {
+        selectedTeamId = teamId;
+        renderTeams();
+    }
+
+    function renderTeams() {
+        teamList.innerHTML = '';
+        teams.forEach(team => {
+            const teamContainer = document.createElement('div');
+            teamContainer.className = `team-container ${team.id === selectedTeamId ? 'selected-team' : ''}`;
+            teamContainer.addEventListener('click', () => selectTeam(team.id));
+
+            const teamHeader = document.createElement('div');
+            teamHeader.className = 'team-header';
+
+            const teamNameDisplay = document.createElement('h3');
+            teamNameDisplay.textContent = team.name;
+
+            const teamCoins = document.createElement('div');
+            teamCoins.textContent = `${team.coins} монет`;
+            teamCoins.className = 'stock-price';
+
+            teamHeader.appendChild(teamNameDisplay);
+            teamHeader.appendChild(teamCoins);
+
+            const teamAssets = document.createElement('div');
+            teamAssets.className = 'team-assets';
+
+            team.assets.forEach(asset => {
+                const business = businesses.find(b => b.id === asset.businessId);
+                const assetElement = document.createElement('div');
+                assetElement.className = 'team-asset';
+
+                const img = document.createElement('img');
+                img.src = business.image;
+                img.alt = business.name;
+
+                const details = document.createElement('div');
+                details.className = 'asset-details';
+                details.innerHTML = `
+                    <div>${business.name}</div>
+                    <div>Акций: ${asset.quantity}</div>
+                    <div>Цена: ${business.price} монет</div>
+                `;
+
+                const sellBtn = document.createElement('button');
+                sellBtn.className = 'sell-btn';
+                sellBtn.textContent = '×';
+                sellBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    sellStock(team, asset.businessId);
+                });
+
+                assetElement.appendChild(img);
+                assetElement.appendChild(details);
+                assetElement.appendChild(sellBtn);
+                teamAssets.appendChild(assetElement);
+            });
+
+            teamContainer.appendChild(teamHeader);
+            teamContainer.appendChild(teamAssets);
+            teamList.appendChild(teamContainer);
+        });
+    }
+
+    function renderBusinesses() {
+        businessList.innerHTML = '';
+        businesses.forEach(business => {
+            const card = document.createElement('div');
+            card.className = 'business-card';
+            card.innerHTML = `
+                <img src="${business.image}" class="business-image" alt="${business.name}">
+                <h3>${business.name}</h3>
+                <p>${business.description}</p>
+                <div class="stock-price">
+                    Цена: ${business.price} монет
+                    <span class="price-change ${business.changePercent >= 0 ? 'price-up' : 'price-down'}">
+                        (${business.changePercent > 0 ? '+' : ''}${business.changePercent}%)
+                    </span>
+                </div>
+            `;
+            card.addEventListener('click', () => buyStock(business.id));
+            businessList.appendChild(card);
+        });
+    }
+
+    function buyStock(businessId) {
+        if (!gameStarted || !selectedTeamId) {
+            alert('Сначала выберите команду!');
+            return;
+        }
+        
+        const business = businesses.find(b => b.id === businessId);
+        const selectedTeam = teams.find(t => t.id === selectedTeamId);
+
+        if (selectedTeam.coins < business.price) {
+            alert('Недостаточно монет!');
+            return;
+        }
+
+        const existingAsset = selectedTeam.assets.find(a => a.businessId === businessId);
+        if (existingAsset && existingAsset.quantity >= 5) {
+            alert('Максимум 5 акций!');
+            return;
+        }
+
+        selectedTeam.coins -= business.price;
+        if (existingAsset) {
+            existingAsset.quantity++;
+        } else {
+            selectedTeam.assets.push({ businessId, quantity: 1 });
+        }
+
+        renderTeams();
+        renderDashboard();
+    }
+
+    function sellStock(team, businessId) {
+        const business = businesses.find(b => b.id === businessId);
+        const assetIndex = team.assets.findIndex(a => a.businessId === businessId);
+
+        team.coins += business.price;
+        team.assets[assetIndex].quantity--;
+
+        if (team.assets[assetIndex].quantity === 0) {
+            team.assets.splice(assetIndex, 1);
+        }
+
+        renderTeams();
+        renderDashboard();
+    }
+
+    function updatePrices(news) {
+        news.effects.forEach(effect => {
+            const business = businesses.find(b => b.id === effect.businessId);
+            const change = (business.price * effect.change) / 100;
+            business.price = Math.round(business.price + change);
+            business.changePercent = effect.change;
+            business.priceHistory.push(business.price);
+        });
+    }
+
+    function showNewsModal(newsItems) {
+        modalContent.innerHTML = newsItems.map(item => `
+            <div class="news-item">
+                <div>${item.text}</div>
+                <div class="news-effect">→ ${item.explanation}</div>
+            </div>
+        `).join('');
+        newsModal.classList.add('show');
+    }
+
+    function startNextRound() {
+        if (currentRound >= 10) return;
+
+        if (currentRound === 0) {
+            document.getElementById('setup-area').classList.add('hidden');
+            document.body.classList.add('game-started');
+        }
+
+        const currentNews = newsRounds[currentRound];
+        currentNews.forEach(news => {
+            updatePrices([news]);
+        });
+        showNewsModal(currentNews);
+
+        currentRound++;
+        document.getElementById('round-display').textContent = currentRound;
+        document.getElementById('current-round').textContent = currentRound;
+
+        renderDashboard();
+        renderBusinesses();
+
+        if (currentRound >= 10) endGame();
+    }
+
+    function endGame() {
+        const sortedTeams = [...teams].sort((a, b) => {
+            const aTotal = a.coins + a.assets.reduce((sum, asset) => {
+                const business = businesses.find(b => b.id === asset.businessId);
+                return sum + (business.price * asset.quantity);
+            }, 0);
+            
+            const bTotal = b.coins + b.assets.reduce((sum, asset) => {
+                const business = businesses.find(b => b.id === asset.businessId);
+                return sum + (business.price * asset.quantity);
+            }, 0);
+            
+            return bTotal - aTotal;
+        });
+
+        document.getElementById('results-body').innerHTML = sortedTeams.map((team, index) => {
+            const total = team.coins + team.assets.reduce((sum, asset) => {
+                const business = businesses.find(b => b.id === asset.businessId);
+                return sum + (business.price * asset.quantity);
+            }, 0);
+            
+            return `
+                <tr class="${index === 0 ? 'winner' : ''}">
+                    <td>${index + 1}</td>
+                    <td>${team.name}</td>
+                    <td>${total} монет</td>
+                </tr>
+            `;
+        }).join('');
+        
+        document.getElementById('news-area').style.display = 'none';
+        document.getElementById('results-area').classList.remove('hidden');
+    }
+
+    function restartGame() {
+        teams = [];
+        currentRound = 0;
+        selectedTeamId = null;
+        gameStarted = false;
+        businesses.forEach(b => {
+            b.price = b.priceHistory[0];
+            b.changePercent = 0;
+        });
+
+        renderBusinesses();
+        teamList.innerHTML = '';
+        document.getElementById('results-area').classList.add('hidden');
+        document.getElementById('setup-area').style.display = 'block';
+        document.getElementById('news-area').style.display = 'none';
+        document.getElementById('round-display').textContent = '1';
+        document.getElementById('current-round').textContent = '1';
+    }
+
+    function closeNewsModal() {
+        newsModal.classList.remove('show');
+    }
+
+    function addTeam() {
+        const teamName = teamNameInput.value.trim();
+        if (!teamName) {
+            alert('Пожалуйста, введите название команды');
+            return;
+        }
+
+        if (teams.some(team => team.name === teamName)) {
+            alert('Команда с таким названием уже существует');
+            return;
+        }
+
+        const newTeam = {
+            id: teams.length + 1,
+            name: teamName,
+            coins: 100,
+            assets: []
+        };
+
+        teams.push(newTeam);
+        teamNameInput.value = '';
+        renderTeams();
+        renderDashboard();
+
+        if (teams.length === 1) {
+            gameStarted = true;
+            document.getElementById('news-area').style.display = 'block';
+        }
+    }
+
+    function init() {
+        renderBusinesses();
+        addTeamBtn.addEventListener('click', addTeam);
+        nextRoundBtn.addEventListener('click', startNextRound);
+        restartBtn.addEventListener('click', restartGame);
+        document.getElementById('close-modal').addEventListener('click', closeNewsModal);
+        document.getElementById('close-news-btn').addEventListener('click', closeNewsModal);
+    }
+
+    init();
+    </script>
+</body>
+</html>
